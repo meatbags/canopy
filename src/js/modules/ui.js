@@ -1,6 +1,7 @@
 /** UI */
 
 import Element from '../util/element';
+import Config from '../config/config';
 
 class UI {
   constructor() {
@@ -16,37 +17,52 @@ class UI {
 
   onChange() {
     this.el.querySelectorAll('[name]').forEach(input => {
-      this.state[input.name] = input.value;
+      this.state[input.name] = input.type === 'number' ? parseFloat(input.value) : input.value;
     });
     console.log(this.state);
   }
 
   render() {
-    if (this.el) return;
     this.el = Element({
       class: 'ui',
       children: [{
         class: 'ui__header',
-        innerText: 'Header'
+        innerText: 'Options'
       }, {
         class: 'ui__body',
-        childNodes: [{
+        children: Object.keys(Config.UI.sections).map(section => ({
           class: 'ui__section',
+          dataset: {
+            id: section,
+          },
           children: [{
-            class: 'ui__row',
+            class: 'title',
             children: [{
-              type: 'label',
-              innerText: 'Value:',
+              innerText: section,
             }, {
-              type: 'input',
-              attribute: {
-                name: 'test',
-                type: 'number',
-                value: 2,
-              },
+              class: 'ui__section-collapse',
+              innerText: '+',
+              addEventListener: {
+                click: () => this.el.querySelector(`[data-id="${section}"]`).classList.toggle('ui__section--collapsed'),
+              }
             }]
+          }, {
+            class: 'rows',
+            children: Object.keys(Config.UI.sections[section]).map(key => ({
+              children: [{
+                type: 'label',
+                innerText: key,
+              }, {
+                type: 'input',
+                attribute: {
+                  name: `${section}.${key}`,
+                  type: 'number',
+                  ...Config.UI.sections[section][key],
+                },
+              }]
+            }))
           }]
-        }]
+        }))
       }]
     });
     document.querySelector('body').appendChild(this.el);

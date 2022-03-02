@@ -35,7 +35,7 @@ const Element = prop => {
       case 'type':
         break;
       default:
-        e[key] = prop;
+        e[key] = value;
     }
   }
 
