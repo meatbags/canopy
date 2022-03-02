@@ -52,15 +52,25 @@
       }
 
       .row {
-        display: flex;
         @include padding(0, 0.25);
+        display: flex;
+        position: relative;
 
         label {
           width: 35%;
+          flex-shrink: 0;
         }
 
         input {
           width: 65%;
+
+          &[type="checkbox"] {
+            display: flex;
+            align-items: flex-end;
+            width: auto;
+            position: absolute;
+            right: 0;
+          }
         }
       }
 

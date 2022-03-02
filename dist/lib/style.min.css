@@ -66,15 +66,23 @@ body {
             top: 50%;
             transform: translate(0, -50%); }
       .ui .ui__body .ui__section .row {
-        display: flex;
         padding-left: 0px;
         padding-right: 0px;
         padding-top: 2.5px;
-        padding-bottom: 2.5px; }
+        padding-bottom: 2.5px;
+        display: flex;
+        position: relative; }
         .ui .ui__body .ui__section .row label {
-          width: 35%; }
+          width: 35%;
+          flex-shrink: 0; }
         .ui .ui__body .ui__section .row input {
           width: 65%; }
+          .ui .ui__body .ui__section .row input[type="checkbox"] {
+            display: flex;
+            align-items: flex-end;
+            width: auto;
+            position: absolute;
+            right: 0; }
       .ui .ui__body .ui__section.ui__section--collapsed .ui__section-collapse:after {
         content: '+'; }
       .ui .ui__body .ui__section.ui__section--collapsed .rows {

@@ -24,12 +24,18 @@ class Viewer {
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 10000);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.camera.position.set(20, 10, 20);
+    this.controls.enablePanning = false;
+    this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
 
     // DOM
     this.el = Element({ class: 'viewer' });
     this.el.appendChild(this.renderer.domElement);
     document.querySelector('body').appendChild(this.el);
+  }
+
+  lookAt(point) {
+    this.controls.target.y = point.y;
   }
 
   resize() {

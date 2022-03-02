@@ -1,5 +1,6 @@
 /** UI */
 
+import * as THREE from 'three';
 import Element from '../util/element';
 import Config from '../config/config';
 
@@ -11,6 +12,7 @@ class UI {
   bind(root) {
     this.ref = {};
     this.ref.Tree = root.modules.Tree;
+    this.ref.Viewer = root.modules.Viewer;
 
     // bind state
     this.state = {};
@@ -25,11 +27,23 @@ class UI {
 
   onChange() {
     this.el.querySelectorAll('[name]').forEach(input => {
-      this.state[input.name] = input.type === 'number' ? parseFloat(input.value) : input.value;
+      let v;
+      switch (input.type) {
+        case 'number': v = parseFloat(input.value); break;
+        case 'checkbox': v = input.checked; break;
+        default: v = input.value; break;
+      }
+      this.state[input.name] = v;
     });
     this.ref.Tree.generate(this.state);
-    //console.log(this.state);
-    console.log('Nodes:', this.ref.Tree.count());
+
+    // viewer
+    this.ref.Viewer.lookAt(new THREE.Vector3(0, this.state.height/2, 0));
+
+    // stats
+    const n = this.ref.Tree.count();
+    this.el.querySelector('[name="nodes"]').value = n;
+    this.el.querySelector('[name="polygons"]').value = n * this.ref.Tree.polycount();
   }
 
   render() {
@@ -47,7 +61,10 @@ class UI {
           children: [{
             class: 'title',
             addEventListener: {
-              click: () => this.el.querySelector(`[data-id="${section}"]`).classList.toggle('ui__section--collapsed'),
+              click: () => {
+                const target = this.el.querySelector(`[data-id="${section}"]`);
+                target.classList.toggle('ui__section--collapsed');
+              },
             },
             children: [{
               innerText: section
@@ -62,11 +79,11 @@ class UI {
                 type: 'label',
                 innerText: key,
               }, {
+                ...Config.UI.sections[section][key],
+                name: key,
                 type: 'input',
                 attribute: {
-                  name: key,
-                  type: 'number',
-                  ...Config.UI.sections[section][key],
+                  type: Config.UI.sections[section][key].type || 'number',
                 },
               }]
             }))
@@ -74,6 +91,21 @@ class UI {
         }))
       }]
     });
+
+    // custom
+    this.el.querySelector('[name="seed"]').parentNode.appendChild(
+      Element({
+        innerHTML: '&#x1F3B2',
+        style: { cursor: 'pointer', marginLeft: '2px' },
+        addEventListener: {
+          click: () => {
+            this.el.querySelector('[name="seed"]').value = Math.floor(Math.random() * 1000000);
+            this.onChange();
+          }
+        }
+      })
+    );
+
     document.querySelector('body').appendChild(this.el);
   }
 }
