@@ -2,11 +2,12 @@
 
 import UI from './ui';
 import Tree from './tree';
+import Viewer from './viewer';
 
 class App {
   constructor() {
     this.modules = {};
-    [UI, Tree].forEach(m => this.modules[m.name] = new m());
+    [UI, Tree, Viewer].forEach(_ => this.modules[_.name] = new _());
 
     // global events
     window.addEventListener('resize', () => this.call('resize'));

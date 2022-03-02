@@ -5,3 +5,93 @@ html, body {
   margin: 0;
   padding: 0; }
 
+body {
+  font-family: "Karla", sans-serif;
+  font-size: 18px;
+  color: #111; }
+
+.ui {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  user-select: none;
+  text-transform: uppercase;
+  font-size: 15px;
+  width: 320px;
+  z-index: 999;
+  background: #fff;
+  border: 1px solid #888;
+  border-radius: 3px; }
+  .ui .ui__body {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px; }
+    .ui .ui__body .ui__section {
+      margin-bottom: 5px; }
+      .ui .ui__body .ui__section:last-child {
+        margin-bottom: 0; }
+      .ui .ui__body .ui__section .title {
+        display: flex;
+        position: relative;
+        background: #888;
+        color: #fff;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 2.5px;
+        padding-bottom: 2.5px;
+        cursor: pointer; }
+        .ui .ui__body .ui__section .title .ui__section-collapse {
+          position: absolute;
+          font-family: monospace;
+          height: 100%;
+          right: 0;
+          top: 0; }
+          .ui .ui__body .ui__section .title .ui__section-collapse:after {
+            content: '-';
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 2.5px;
+            padding-bottom: 2.5px;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translate(0, -50%); }
+      .ui .ui__body .ui__section .row {
+        display: flex;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 2.5px;
+        padding-bottom: 2.5px; }
+        .ui .ui__body .ui__section .row label {
+          width: 35%; }
+        .ui .ui__body .ui__section .row input {
+          width: 65%; }
+      .ui .ui__body .ui__section.ui__section--collapsed .ui__section-collapse:after {
+        content: '+'; }
+      .ui .ui__body .ui__section.ui__section--collapsed .rows {
+        display: none; }
+
+.viewer {
+  z-index: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+  .viewer canvas {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); }
+

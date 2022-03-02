@@ -6,20 +6,30 @@ import Config from '../config/config';
 class UI {
   constructor() {
     this.render();
+  }
+
+  bind(root) {
+    this.ref = {};
+    this.ref.Tree = root.modules.Tree;
 
     // bind state
     this.state = {};
-    this.onChange();
     this.el.querySelectorAll('[name]').forEach(input => {
       input.addEventListener('change', () => this.onChange());
     });
+  }
+
+  init() {
+    this.onChange();
   }
 
   onChange() {
     this.el.querySelectorAll('[name]').forEach(input => {
       this.state[input.name] = input.type === 'number' ? parseFloat(input.value) : input.value;
     });
-    console.log(this.state);
+    this.ref.Tree.generate(this.state);
+    //console.log(this.state);
+    console.log('Nodes:', this.ref.Tree.count());
   }
 
   render() {
@@ -27,7 +37,6 @@ class UI {
       class: 'ui',
       children: [{
         class: 'ui__header',
-        innerText: 'Options'
       }, {
         class: 'ui__body',
         children: Object.keys(Config.UI.sections).map(section => ({
@@ -37,25 +46,25 @@ class UI {
           },
           children: [{
             class: 'title',
+            addEventListener: {
+              click: () => this.el.querySelector(`[data-id="${section}"]`).classList.toggle('ui__section--collapsed'),
+            },
             children: [{
-              innerText: section,
+              innerText: section
             }, {
-              class: 'ui__section-collapse',
-              innerText: '+',
-              addEventListener: {
-                click: () => this.el.querySelector(`[data-id="${section}"]`).classList.toggle('ui__section--collapsed'),
-              }
+              class: 'ui__section-collapse'
             }]
           }, {
             class: 'rows',
             children: Object.keys(Config.UI.sections[section]).map(key => ({
+              class: 'row',
               children: [{
                 type: 'label',
                 innerText: key,
               }, {
                 type: 'input',
                 attribute: {
-                  name: `${section}.${key}`,
+                  name: key,
                   type: 'number',
                   ...Config.UI.sections[section][key],
                 },
