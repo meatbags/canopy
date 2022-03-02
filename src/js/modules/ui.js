@@ -4,6 +4,25 @@ import Element from '../util/element';
 
 class UI {
   constructor() {
+    this.render();
+
+    // bind state
+    this.state = {};
+    this.onChange();
+    this.el.querySelectorAll('[name]').forEach(input => {
+      input.addEventListener('change', () => this.onChange());
+    });
+  }
+
+  onChange() {
+    this.el.querySelectorAll('[name]').forEach(input => {
+      this.state[input.name] = input.value;
+    });
+    console.log(this.state);
+  }
+
+  render() {
+    if (this.el) return;
     this.el = Element({
       class: 'ui',
       children: [{
@@ -30,13 +49,7 @@ class UI {
         }]
       }]
     });
-
-    this.state = {};
-
-    // bind state
-    this.el.querySelector('[name]').forEach(input => {
-      this.state[input.name] =
-    });
+    document.querySelector('body').appendChild(this.el);
   }
 }
 
