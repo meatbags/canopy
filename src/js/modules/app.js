@@ -3,11 +3,12 @@
 import UI from './ui';
 import Tree from './tree';
 import Viewer from './viewer';
+import Materials from './materials';
 
 class App {
   constructor() {
     this.modules = {};
-    [UI, Tree, Viewer].forEach(_ => this.modules[_.name] = new _());
+    [UI, Tree, Viewer, Materials].forEach(_ => this.modules[_.name] = new _());
 
     // global events
     window.addEventListener('resize', () => this.call('resize'));

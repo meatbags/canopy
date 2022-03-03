@@ -7,10 +7,11 @@ export default {
         seed: { value: 0, }
       },
       tree: {
-        thickness: { value: 1, min: 0 },
-        height: { value: 5, min: 0 },
+        thickness: { value: 1, min: 0.1, step: 0.1 },
+        height: { value: 5, min: 1, step: 0.25 },
         branches: { value: 1, min: 0 },
-        subdivide: { value: 0, min: 0 },
+        depth: { value: 1, min: 0 },
+        placement: { type: 'slider2', min: 0, max: 100 },
       },
       mesh: {
         radial: { value: 6, min: 2 },

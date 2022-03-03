@@ -12,18 +12,18 @@ class Tree {
     this.ref = {};
     this.ref.root = root;
     this.ref.Viewer = root.modules.Viewer;
+    this.ref.Materials = root.modules.Materials;
   }
 
-  generate(state) {
-    this.random = new Random(state.seed);
+  set(state) {
+    if (!(state.changed.tree || state.changed.global || state.changed.mesh)) return;
+
+    this.state = state;
+    this.random = new Random(this.state['global.seed']);
     this.depth = state.depth || 0;
     this.position = state.position || new Vector();
     this.direction = state.direction || new Vector(0, 1, 0);
-    this.divisions = {radial: state.radial, vertical: state.vertical};
-    this.height = state.height;
     this.extent = this.direction.clone().scale(this.height).add(this.position);
-    this.thickness = state.thickness;
-    this.radius = this.thickness / 2;
 
     // material
     this.wireframe = state.wireframe === undefined ? false : state.wireframe;
@@ -31,13 +31,15 @@ class Tree {
 
     // children
     this.children = this.children || [];
+    const branches = this.state['tree.branches'];
+    const maxDepth = this.state['tree.depth'];
 
-    if (this.depth <= state.subdivide) {
+    if (this.depth <= maxDepth) {
       // create geometry
       this.setGeometry();
 
       // generate branches
-      for (let i=0; i<state.branches; i++) {
+      for (let i=0; i<branches; i++) {
         const seed = this.random.random();
         const depth = this.depth + 1;
         const position = this.getPosition();
@@ -46,17 +48,17 @@ class Tree {
 
         // create
         if (i < this.children.length) {
-          this.children[i].generate(nextState);
+          this.children[i].set(nextState);
         } else {
           const child = new Tree();
           child.bind(this.ref.root);
-          child.generate(nextState);
+          child.set(nextState);
           this.children.push(child);
         }
       }
 
       // prune
-      while (this.children.length > state.branches) {
+      while (this.children.length > branches) {
         this.children.pop().remove();
       }
     } else {
@@ -69,7 +71,11 @@ class Tree {
     const geo = this.geometry || new THREE.BufferGeometry();
 
     // settings
-    const tris = this.divisions.radial * this.divisions.vertical * 2;
+    const radius = this.state['tree.thickness'] / 2;
+    const height = this.state['tree.height'];
+    const vmax = this.state['mesh.vertical'];
+    const rmax = this.state['mesh.radial'];
+    const tris = vmax * rmax * 2;
     const index = new Uint16Array(tris * 3);
     const position = new Float32Array((tris + 2) * 3);
     const normal = new Float32Array((tris + 2) * 3);
@@ -82,20 +88,20 @@ class Tree {
     };
 
     // create buffer data
-    for (let y=0; y<this.divisions.vertical+1; y++) {
-      const y0 = y / this.divisions.vertical * this.height;
-      const base = y * this.divisions.radial;
-      for (let r=0, rmax=this.divisions.radial; r<rmax; r++) {
+    for (let y=0; y<vmax+1; y++) {
+      const y0 = y / vmax * height;
+      const base = y * rmax;
+      for (let r=0; r<rmax; r++) {
         const angle = r / rmax * Math.PI * 2;
         const sa = Math.sin(angle);
         const ca = Math.cos(angle);
-        const x0 = sa * this.radius;
-        const z0 = ca * this.radius;
+        const x0 = sa * radius;
+        const z0 = ca * radius;
         const i = base + r;
         write(position, [x0, y0, z0], i * 3);
         write(normal, [sa, 0, ca], i * 3);
         write(uv, [0, 0], i * 2);
-        if (y !== this.divisions.vertical) {
+        if (y !== vmax) {
           if (r < rmax - 1) {
             write(index, [i, i+1, i+rmax, i+rmax+1, i+rmax, i+1], i*6);
           } else {
@@ -113,14 +119,11 @@ class Tree {
 
     // add mesh
     if (!this.mesh) {
-      const mat = new THREE.MeshStandardMaterial({color: 0x888888});
-      this.mesh = new THREE.Mesh(geo, mat);
+      this.mesh = new THREE.Mesh(geo, this.ref.Materials.get('bark'));
       this.geometry = this.mesh.geometry;
     }
 
     // settings
-    this.mesh.material.wireframe = this.wireframe;
-    this.mesh.material.side = this.backface ? THREE.DoubleSide : THREE.FrontSide;
     this.mesh.position.set(this.position.x, this.position.y, this.position.z);
 
     // add
